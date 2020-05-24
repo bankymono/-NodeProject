@@ -11,8 +11,6 @@ const promoRouter = require('./routes/promoRouter');
 const leadersRouter = require('./routes/leadersRouter');
 
 
-
-
 const app = express();
 
 // view engine setup
@@ -30,6 +28,24 @@ app.use('/users', usersRouter);
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leadersRouter);
+
+const mongoose = require('mongoose')
+const Dishes = require('./models/dishes.model')
+
+const url = 'mongodb://localhost:27017/conFusion'
+
+const connect = mongoose.connect(url,
+  {
+    useNewUrlParser:true,
+    useUnifiedTopology:true,
+    useCreateIndex:true
+  })
+
+connect.then((db)=>{
+  console.log('Server Connected to database properly')
+},(err)=>{
+  console.log(err)
+})
 
 
 // catch 404 and forward to error handler
