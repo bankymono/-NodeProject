@@ -7,7 +7,7 @@ const session = require('express-session')
 const FileStore = require('session-file-store')(session)
 
 const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/usersRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leadersRouter = require('./routes/leadersRouter');
@@ -33,13 +33,15 @@ app.use(session({
   store: new FileStore()
 }))
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+
 app.use(auth)
 
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leadersRouter);
