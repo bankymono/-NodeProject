@@ -1,21 +1,14 @@
 const auth = (req,res,next) =>{
-    console.log(req.session)
+    console.log(req.user)
 
-    if(!req.session.user){
+    if(!req.user){
         const err = new Error('You are not authenticated!')
 
-        err.status = 401
+        err.status = 403
         return next(err)
 
     }else{
-        if(req.session.user === 'authenticated'){
-            next()
-        }else{
-            const err = new Error('You are not authenticated!')
-
-            err.status = 401
-            return next(err)
-        }
+        next()
     }
 }
 

@@ -5,6 +5,7 @@ const path = require('path');
 const logger = require('morgan');
 const session = require('express-session')
 const FileStore = require('session-file-store')(session)
+const passport = require('./passport')
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/usersRouter');
@@ -32,6 +33,9 @@ app.use(session({
   resave:false,
   store: new FileStore()
 }))
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
