@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser')
-const passport = require('../passport')
+const passport = require('../passport-authentication').passport
 const Users = require('../models/users.model')
 
 
@@ -19,7 +19,7 @@ router.post('/signup', function(req, res, next) {
       res.setHeader('Content-Type', 'application/json')
       res.json({err})  
     }else{
-      passport.authenticate('local-auth')(req,res,()=>{
+      passport.authenticate('local')(req,res,()=>{
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
         res.json({success:true, status:'Registration successful!'})
@@ -28,7 +28,7 @@ router.post('/signup', function(req, res, next) {
   })
 })
 
-router.post('/login', passport.authenticate('local-auth'),function(req,res,next){
+router.post('/login', passport.authenticate('local'),function(req,res,next){
   res.statusCode = 200
   res.setHeader('Content-Type', 'application/json')
   res.json({success:true, status:'You are successfully logged in'})

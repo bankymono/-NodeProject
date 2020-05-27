@@ -5,7 +5,8 @@ const path = require('path');
 const logger = require('morgan');
 const session = require('express-session')
 const FileStore = require('session-file-store')(session)
-const passport = require('./passport')
+const passport = require('./passport-authentication').passport
+//const authenticate = require('./authentication/authentication')
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/usersRouter');
