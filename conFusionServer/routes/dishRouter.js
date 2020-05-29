@@ -11,6 +11,7 @@ dishRouter.use(bodyParser.json())
 
 dishRouter.get('/', (req,res,next)=>{
   Dishes.find({})
+  .populate('comments.author')
   .then( (dishes)=>{
     res.statusCode= 200
     res.setHeader('Content-type','application/json')
@@ -47,6 +48,7 @@ dishRouter.delete('/', verifyUser, (req,res,next)=>{
 
 dishRouter.get('/:dishId', (req,res,next)=>{
   Dishes.findById(req.params.dishId)
+  .populate('comments.author')
   .then(dish=>{
     res.statusCode= 200
     res.setHeader('Content-type','application/json')
@@ -85,6 +87,7 @@ dishRouter.delete('/:dishId', verifyUser, (req,res,next)=>{
 //comments
 dishRouter.get('/:dishId/comments', (req,res,next)=>{
   Dishes.findById(req.params.dishId)
+  .populate('comments.author')
   .then( (dish)=>{
     if(dish !==null){
       res.statusCode= 200
@@ -103,12 +106,17 @@ dishRouter.post('/:dishId/comments', verifyUser, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then(dish=>{
     if(dish !==null){
+      req.body.author = req.user._id
       dish.comments.push(req.body)
       dish.save()
       .then((dish)=>{
-        res.statusCode= 200
-        res.setHeader('Content-type','application/json')
-        res.json(dish)
+        Dishes.findById(dish._id)
+        .populate('comments.author')
+        .then((dish)=>{
+          res.statusCode = 200
+          res.setHeader('Content-type','application/json')
+          res.json(dish)
+        })
       },err=>next(err))  
     }else{
       err = new Error('Dish' + req.params.dishId + 'not found')
@@ -149,6 +157,7 @@ dishRouter.delete('/:dishId/comments', verifyUser, (req,res,next)=>{
 
 dishRouter.get('/:dishId/comments/:commentId', (req,res,next)=>{
   Dishes.findById(req.params.dishId)
+  .populate('comments.author')
   .then(dish=>{
     if(dish !==null && dish.comments.id(req.params.commentId) !== null){
       res.statusCode= 200
@@ -185,9 +194,13 @@ dishRouter.put('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
       }
       dish.save()
       .then((dish)=>{
-        res.statusCode= 200
-        res.setHeader('Content-type','application/json')
-        res.json(dish)
+        Dishes.findById(dish._id)
+        .populate('comments.author')
+        .then((dish)=>{
+          res.statusCode= 200
+          res.setHeader('Content-type','application/json')
+          res.json(dish)
+        })
       }, err=>next(err))
     }else if (dish == null){
       err = new Error('Dish' + req.params.dishId + 'not found')
@@ -209,9 +222,13 @@ dishRouter.delete('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
       dish.comments.id(req.params.commentId).remove()
       dish.save()
       .then((dish)=>{
-        res.statusCode= 200
-        res.setHeader('Content-type','application/json')
-        res.json(dish)
+        Dishes.findById(dish._id)
+        .populate('comments.author')
+        .then((dish)=>{
+          res.statusCode= 200
+          res.setHeader('Content-type','application/json')
+          res.json(dish)
+        })
       },err=>next(err))
     }else if (dish == null){
       err = new Error('Dish' + req.params.dishId + 'not found')
