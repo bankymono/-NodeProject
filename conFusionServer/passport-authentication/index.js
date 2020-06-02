@@ -18,6 +18,17 @@ exports.getToken = (user) => {
 
 passport.use('jwt-strategy',JwtStrategy)
 exports.verifyUser = passport.authenticate('jwt-strategy',{session:false})
+exports.verifyAdmin = (req,res,next) =>{
+    if(!req.user.admin){
+        const err = new Error("You are not Authorized to perform this operation!")
+        err.status = 403
+        return next(err)
+    }
+    else{
+        return next()
+    }
+}
+
 exports.passport = passport
 
 console.log(exports)

@@ -12,7 +12,6 @@ router.post('/signup', (req,res)=>{
         error:error.message || 'Internal server error'
       })
     }
-
     return res.json(user)
 
   })(req,res);
