@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const verifyUser = require('../passport-authentication').verifyUser
 const verifyAdmin = require('../passport-authentication').verifyAdmin
+const cors = require('./cors')
 
 const Dishes = require('../models/dishes.model')
 
@@ -10,9 +11,18 @@ const dishRouter = express.Router()
 
 dishRouter.use(bodyParser.json())
 
-dishRouter.get('/', (req,res,next)=>{
+dishRouter.route('/').options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
+
+dishRouter.route('/:dishId').options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
+
+dishRouter.route('/:dishId/comments').options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
+
+dishRouter.route('/:dishId/comments/:commentId').options(cors.corsWithOptions,(req,res)=>{res.sendStatus(200)})
+
+
+dishRouter.get('/', cors.cors, (req,res,next)=>{
   Dishes.find({})
-  .populate('comments.author')
+    .populate('comments.author')
   .then( (dishes)=>{
     res.statusCode= 200
     res.setHeader('Content-type','application/json')
@@ -21,7 +31,7 @@ dishRouter.get('/', (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.post('/',verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.post('/', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   Dishes.create(req.body)
   .then(dish=>{
     console.log('dish created',dish)
@@ -32,12 +42,12 @@ dishRouter.post('/',verifyUser, verifyAdmin, (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.put('/', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.put('/', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   res.statusCode=403
   res.end('PUT operation not supported on /dishes')
 })
 
-dishRouter.delete('/', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.delete('/', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   Dishes.remove({})
   .then(resp=>{
     res.statusCode= 200
@@ -47,7 +57,7 @@ dishRouter.delete('/', verifyUser, verifyAdmin, (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.get('/:dishId', (req,res,next)=>{
+dishRouter.get('/:dishId', cors.cors, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .populate('comments.author')
   .then(dish=>{
@@ -58,12 +68,12 @@ dishRouter.get('/:dishId', (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.post('/:dishId', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.post('/:dishId', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   res.statusCode = 403
   res.end('POST operation not supported on /dishes/'+req.params.dishId)
 })
 
-dishRouter.put('/:dishId', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.put('/:dishId', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   Dishes.findByIdAndUpdate(req.params.dishId,{
     $set:req.body
   },{new:true})
@@ -75,7 +85,7 @@ dishRouter.put('/:dishId', verifyUser, verifyAdmin, (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.delete('/:dishId', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.delete('/:dishId', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   Dishes.findByIdAndRemove(req.params.dishId)
   .then(resp=>{
     res.statusCode= 200
@@ -86,7 +96,7 @@ dishRouter.delete('/:dishId', verifyUser, verifyAdmin, (req,res,next)=>{
 })
 
 //comments
-dishRouter.get('/:dishId/comments', (req,res,next)=>{
+dishRouter.get('/:dishId/comments', cors.cors, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .populate('comments.author')
   .then( (dish)=>{
@@ -103,7 +113,7 @@ dishRouter.get('/:dishId/comments', (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.post('/:dishId/comments', verifyUser, (req,res,next)=>{
+dishRouter.post('/:dishId/comments', cors.corsWithOptions, verifyUser, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then(dish=>{
     if(dish !==null){
@@ -128,13 +138,13 @@ dishRouter.post('/:dishId/comments', verifyUser, (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.put('/:dishId/comments', verifyUser, (req,res,next)=>{
+dishRouter.put('/:dishId/comments', cors.corsWithOptions, verifyUser, (req,res,next)=>{
   res.statusCode=403
   res.end('PUT operation not supported on /dishes/'
   + req.params.dishId + '/comments')
 })
 
-dishRouter.delete('/:dishId/comments', verifyUser, verifyAdmin, (req,res,next)=>{
+dishRouter.delete('/:dishId/comments', cors.corsWithOptions, verifyUser, verifyAdmin, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then(dish=>{
     if(dish !==null){
@@ -156,7 +166,7 @@ dishRouter.delete('/:dishId/comments', verifyUser, verifyAdmin, (req,res,next)=>
   .catch(err=> next(err))
 })
 
-dishRouter.get('/:dishId/comments/:commentId', (req,res,next)=>{
+dishRouter.get('/:dishId/comments/:commentId', cors.cors, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .populate('comments.author')
   .then(dish=>{
@@ -177,13 +187,13 @@ dishRouter.get('/:dishId/comments/:commentId', (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.post('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
+dishRouter.post('/:dishId/comments/:commentId', cors.corsWithOptions, verifyUser, (req,res,next)=>{
   res.statusCode = 403
   res.end('POST operation not supported on /dishes/'+req.params.dishId
   + '/comments/'+req.params.commentId)
 })
 
-dishRouter.put('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
+dishRouter.put('/:dishId/comments/:commentId', cors.corsWithOptions, verifyUser, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then(dish=>{
     if(dish !==null && dish.comments.id(req.params.commentId) !== null){
@@ -222,7 +232,7 @@ dishRouter.put('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
   .catch(err=> next(err))
 })
 
-dishRouter.delete('/:dishId/comments/:commentId', verifyUser, (req,res,next)=>{
+dishRouter.delete('/:dishId/comments/:commentId', cors.corsWithOptions, verifyUser, (req,res,next)=>{
   Dishes.findById(req.params.dishId)
   .then(dish=>{
     if(dish !==null && dish.comments.id(req.params.commentId) !== null){

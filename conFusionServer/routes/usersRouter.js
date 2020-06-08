@@ -6,12 +6,15 @@ const verifyAdmin = require('../passport-authentication').verifyAdmin
 const verifyUser = require('../passport-authentication').verifyUser
 const getToken = require('../passport-authentication').getToken
 
+const cors = require('./cors')
+
+
 
 const router = express.Router();
 router.use(bodyParser.json())
 
 /* GET users listing. */
-router.get('/',verifyUser, verifyAdmin, function(req, res, next) {
+router.get('/', cors.corsWithOptions, verifyUser, verifyAdmin, function(req, res, next) {
   Users.find({})
   .then( (users)=>{
     res.statusCode= 200
@@ -21,7 +24,7 @@ router.get('/',verifyUser, verifyAdmin, function(req, res, next) {
   .catch(err=> next(err))
 });
 
-router.post('/signup', function(req, res, next) {
+router.post('/signup', cors.corsWithOptions, function(req, res, next) {
   Users.register(new Users({username:req.body.username}),req.body.password,(err,user)=>{
     if(err){
       res.statusCode = 500
@@ -49,14 +52,14 @@ router.post('/signup', function(req, res, next) {
   })
 })
 
-router.post('/login', passport.authenticate('local'),function(req,res,next){
+router.post('/login', cors.corsWithOptions, passport.authenticate('local'),function(req,res,next){
   const token = getToken({_id:req.user._id})
   res.statusCode = 200
   res.setHeader('Content-Type', 'application/json')
   res.json({success: true, token: token, status: 'You are successfully logged in'})
 })
 
-router.get('/logout',function(req,res,next){
+router.get('/logout', cors.corsWithOptions, function(req,res,next){
   if(req.session){
     req.session.destroy()
     res.clearCookie('session-id')
