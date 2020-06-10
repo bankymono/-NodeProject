@@ -3,6 +3,7 @@ const LocalStrategy = require('./localAuth')
 const User = require('../models/users.model')
 const JwtStrategy = require('./jwtStrategy')
 const jwt = require('jsonwebtoken')
+const FacebookStrategy = require('./facebookStrategy')
 
 const config = require('../config')
 
@@ -28,6 +29,8 @@ exports.verifyAdmin = (req,res,next) =>{
         return next()
     }
 }
+
+passport.use('facebook-token', FacebookStrategy)
 
 exports.passport = passport
 
