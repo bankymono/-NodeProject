@@ -13,7 +13,7 @@ promoRouter.use(bodyParser.json())
 
 
 promoRouter.get('/', cors.cors, (req,res,next)=>{
-  Promotion.find({})
+  Promotion.find(req.query)
   .then( (promotions)=>{
     res.statusCode= 200
     res.setHeader('Content-type','application/json')

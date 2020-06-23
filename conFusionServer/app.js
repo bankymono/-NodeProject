@@ -15,6 +15,7 @@ const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leadersRouter = require('./routes/leadersRouter');
 const uploadRouter = require('./routes/uploadRouter');
+const commentRouter = require('./routes/commentRouter');
 
 const auth = require('./authentication/auth')
 
@@ -50,6 +51,7 @@ app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leaders', leadersRouter);
 app.use('/imageUpload',uploadRouter)
+app.use('/comments',commentRouter)
 
 const mongoose = require('mongoose')
 const Dishes = require('./models/dishes.model')
